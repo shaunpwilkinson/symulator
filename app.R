@@ -43,7 +43,7 @@ server <- function(input, output) {
     myseq <- gsub("[ -]", "", myseq)
     myseq <- gsub("U", "T", myseq)
     thresh <- input$threshold
-    if(grepl("[^ACGT]", myseq)){
+    if(grepl("[^ACGTMRWSYKVHDBN]", myseq)){
       output$text1 <- renderText({
         "ERROR: SEQUENCE CONTAINS NON STANDARD CHARACTERS"
       })
