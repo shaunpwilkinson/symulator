@@ -13,7 +13,7 @@ library("insect")
 
 ui <- fluidPage(
    titlePanel(h1("symulator")),
-   titlePanel(h4("clade-level identification for Symbiodinium ITS2 sequences")),
+   titlePanel(h4("Clade-level identification for Symbiodinium ITS2 sequences")),
    fluidRow(column(12, br(), textInput("sequence", "Paste your sequence here:", 
                                        width = "200%"))),
    fluidRow(column(12, br(),
@@ -35,7 +35,6 @@ ui <- fluidPage(
    )
 )
 
-# Define server logic required to draw a histogram
 server <- function(input, output) {
   tree <- readRDS("./data/classification_tree2.rds")
   observeEvent(input$do,{
@@ -52,16 +51,15 @@ server <- function(input, output) {
       names(myseq) <- "S1"
       myseq[[1]] <- shave(myseq[[1]], motif = attr(tree, "model"))
       classif <- classify(myseq, tree, threshold = thresh)
+      classif$taxon <- as.character(classif$taxon) # change from factor
       if(is.na(classif$score[1])) classif$score[1] <- 0.999
       if(classif$score[1] == 1) classif$score[1] <- 0.999
       if(classif$taxon[1] == "root") classif$taxon[1] <- "unknown"
       output$text1 <- renderText({
         paste0("Clade ", classif$taxon[1], " with probability ", classif$score[1], "\n")
-        #out  <- data.frame(taxon = paste0("Clade ", classif$taxon[1]), probability = classif$score[1]) 
-        #out
       })
     }
-
+    # placeholder
     # output$plot1 <- renderPlot({
     #   plot(0:1, 0:1, type = "n")
     # })
