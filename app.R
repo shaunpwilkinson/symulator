@@ -34,6 +34,7 @@ server <- function(input, output) {
       })
     }else{
       myseq <- char2dna(myseq)
+      names(myseq) <- "S1"
       myseq[[1]] <- shave(myseq[[1]], motif = attr(tree, "model"))
       classif <- classify(myseq, tree)
       if(is.na(classif$score[1])) classif$score[1] <- 0.999
