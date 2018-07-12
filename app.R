@@ -1,5 +1,15 @@
 library(shiny)
-library(insect)
+
+# Required libraries
+packagelist <- ("insect")
+
+# Check which packages are missing
+missing <- packagelist[!(packagelist %in% installed.packages()[,"Package"])]
+
+# Install missing packages with dependencies
+if(length(missing)) install.packages(missing, dependencies = TRUE)
+
+library(packagelist)
 
 ui <- fluidPage(
    titlePanel(h1("symulator")),
