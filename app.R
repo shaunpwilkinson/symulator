@@ -9,14 +9,18 @@ missing <- packagelist[!(packagelist %in% installed.packages()[,"Package"])]
 # Install missing packages with dependencies
 if(length(missing)) install.packages(missing, dependencies = TRUE)
 
-library(packagelist)
+library("insect")
 
 ui <- fluidPage(
    titlePanel(h1("symulator")),
    titlePanel(h4("clade-level identification for Symbiodinium ITS2 sequences")),
    fluidRow(column(12, br(), textInput("sequence", "Paste your sequence here:", 
                                        width = "200%"))),
-   fluidRow(column(6, actionButton("do", "Go"), br(), br(), br())),
+   fluidRow(column(12, br(),
+                   sliderInput(
+                     "threshold","Akaike weight threshold", min = 0.5, max = 1, value = 0.9))),
+   #fluidRow(column(12, br(), fileInput("fasta", "or Load ITS2 .fasta file", multiple = FALSE, accept = NULL))),
+   fluidRow(column(6, actionButton("do", "Go", icon = icon("barcode", lib = "glyphicon")), br(), br(), br())),
    fluidRow(
      column(12,
             mainPanel(
@@ -38,7 +42,8 @@ server <- function(input, output) {
     myseq <- toupper(input$sequence)
     myseq <- gsub("[ -]", "", myseq)
     myseq <- gsub("U", "T", myseq)
-    if(grepl("[^ACGTMRWSYKVHDBN]", myseq)){
+    thresh <- input$threshold
+    if(grepl("[^ACGT]", myseq)){
       output$text1 <- renderText({
         "ERROR: SEQUENCE CONTAINS NON STANDARD CHARACTERS"
       })
@@ -46,7 +51,7 @@ server <- function(input, output) {
       myseq <- char2dna(myseq)
       names(myseq) <- "S1"
       myseq[[1]] <- shave(myseq[[1]], motif = attr(tree, "model"))
-      classif <- classify(myseq, tree)
+      classif <- classify(myseq, tree, threshold = thresh)
       if(is.na(classif$score[1])) classif$score[1] <- 0.999
       if(classif$score[1] == 1) classif$score[1] <- 0.999
       if(classif$taxon[1] == "root") classif$taxon[1] <- "unknown"
